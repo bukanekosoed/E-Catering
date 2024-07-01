@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}
+Daftar Akun
+{% endblock %}
+{% block content %}
+
+<section class="vh-100 overflow-hidden" style="background-color: #9A616D;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+                    
+            <div class="col col-xl-10">
+                <div class="card rounded-5 overflow-hidden">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                  
+                        {% for category, message in messages %}
+                        <div class="alert w-100 alert-warning alert-dismissible fade show  position-absolute"
+                            role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    
+                    {% endif %}
+                    {% endwith %}
+                    <div class="row g-0">
+                        <div class="col-md-6 col-lg-5 d-none d-md-block">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp"
+                                alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
+                        </div>
+                        <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                            
+                            <div class="card-body p-4 p-lg-5 text-black">
+                                <div class="d-flex align-items-center mb- pb-1 text-primary h1 fw-bold mb-0">
+                                    Langgeng <span class="h1 fw-bold mb-0 text-secondary">Catering</span>
+                                </div>
+                                <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Masuk Ke Akun Anda
+                                </h5>
+                                <form method="post" action="{{ url_for('auth.register') }}">
+                                    <div class="login-form">
+                                        <div class="container">
+                                            
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="name"
+                                                placeholder="Enter your name" name="name" required>
+                                            <label for="name">Nama</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="email" class="form-control" id="inputEmail"
+                                                placeholder="Enter your email" name="email">
+                                            <label for="inputEmail">Alamat Email</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" id="inputPhone"
+                                                placeholder="Enter your phone number" name="phone">
+                                            <label for="inputPhone">Nomor Telepon</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="password" class="form-control" id="inputPassword"
+                                                placeholder="Enter your password" name="password"
+                                                autocomplete="new-password">
+                                            <label for="inputPassword">Kata Sandi</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="password" class="form-control" id="inputConfirmPassword"
+                                                placeholder="Confirm your password" name="confirmPassword"
+                                                autocomplete="new-password">
+                                            <label for="inputConfirmPassword">Konfirmasi Kata Sandi</label>
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-primary login-btn d-block mx-auto w-100 mb-5 shadow p-3 rounded-5">
+                                            Daftar</button>
+                                        <p class="mb-5 pb-lg-2">Anda Sudah Punya Akun? <a
+                                                href="{{url_for('auth.login')}}"
+                                                class="text-decoration-none text-primary">Masuk Disini</a></p>
+                                    </div>
+                                </form>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
