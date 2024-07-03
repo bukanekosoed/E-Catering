@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 import re
 from models import User  # Correctly import User model
 
+
 # Initialize Flask-Bcrypt
 bcrypt = Bcrypt()
 
@@ -26,11 +27,11 @@ def create_auth_bp(users_collection, admins_collection):
             if admin and bcrypt.check_password_hash(admin['password'], password):
                 admin_obj = User(id=str(admin['_id']), email=admin['email'], role='admin')
                 login_user(admin_obj)
-                return redirect(url_for('admin_dashboard'))
+                return redirect(url_for('admin.dashboard'))
 
             flash('Invalid email or password')
 
-        return render_template('login.html')
+        return render_template('auth/login.html')
 
     @auth_bp.route('/register', methods=['GET', 'POST'])
     def register():
@@ -78,7 +79,7 @@ def create_auth_bp(users_collection, admins_collection):
                 flash('Registration successful. Please log in.')
                 return redirect(url_for('auth.login'))
 
-        return render_template('register.html')
+        return render_template('auth/register.html')
 
 
     return auth_bp

@@ -1,0 +1,197 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Daftar Menu</h1>
+    <!-- Tombol untuk memunculkan modal tambah menu -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahMenuModal">
+        Tambah Menu Makanan
+    </button>
+</div>
+
+<!-- Modal Tambah Menu -->
+<div class="modal fade" id="tambahMenuModal" tabindex="-1" role="dialog" aria-labelledby="tambahMenuModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahMenuModalLabel">Tambah Menu Makanan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Form untuk tambah menu -->
+                <form method="POST" action="{{ url_for('admin.add_menu') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="namaMenu">Nama Menu</label>
+                        <input type="text" class="form-control" id="namaMenu" name="namaMenu" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hargaMenu">Harga</label>
+                        <input type="number" class="form-control" id="hargaMenu" name="hargaMenu" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="minimalPembelian">Minimal Pembelian</label>
+                        <input type="number" class="form-control" id="minimalPembelian" name="minimalPembelian"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="kategoriMenu">Kategori</label>
+                        <select class="form-control" id="kategoriMenu" name="kategoriMenu" required>
+                            <option value="Nasi Kotak">Nasi Kotak</option>
+                            <option value="Snack Box">Snack Box</option>
+                            <option value="Prasmanan">Prasmanan</option>
+                            <option value="Tumpeng">Tumpeng</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gambarMenu">Gambar Menu</label>
+                        <input type="file" class="form-control-file" id="gambarMenu" name="gambarMenu" accept="image/*"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daftar Menu -->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        {% if menu_count > 0 %}
+        <div class="input-group mb-3 ms-auto w-25">
+            <input type="text" class="form-control" placeholder="Cari menu..." id="searchInput">
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered m-0" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nama Menu</th>
+                        <th>Harga</th>
+                        <th>Minimal Pembelian</th>
+                        <th>Kategori</th>
+                        <th>Gambar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for menu in menus %}
+                    <tr>
+                        <td>{{ menu.nama }}</td>
+                        <td>{{ menu.harga }}</td>
+                        <td>{{ menu.minimal_pembelian }}</td>
+                        <td>{{ menu.kategori }}</td>
+                        <td><img src="{{ url_for('static', filename=menu.gambar[7:]) }}" alt="{{ menu.nama }}"
+                                height="50"></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" data-toggle="modal"
+                                data-target="#editMenuModal{{ menu._id }}">Edit</a>
+                            <form method="POST" action="{{ url_for('admin.delete_menu', menu_id=menu._id) }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <!-- Modal Edit Menu -->
+                    <div class="modal fade" id="editMenuModal{{ menu._id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="editMenuModalLabel{{ menu._id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editMenuModalLabel{{ menu._id }}">Edit Menu Makanan</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Form untuk edit menu -->
+                                    <form method="POST" action="{{ url_for('admin.edit_menu', menu_id=menu._id) }}"
+                                        enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <label for="editNamaMenu{{ menu._id }}">Nama Menu</label>
+                                            <input type="text" class="form-control" id="editNamaMenu{{ menu._id }}"
+                                                name="editNamaMenu" value="{{ menu.nama }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editHargaMenu{{ menu._id }}">Harga</label>
+                                            <input type="number" class="form-control" id="editHargaMenu{{ menu._id }}"
+                                                name="editHargaMenu" value="{{ menu.harga }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editMinimalPembelian{{ menu._id }}">Minimal Pembelian</label>
+                                            <input type="number" class="form-control"
+                                                id="editMinimalPembelian{{ menu._id }}" name="editMinimalPembelian"
+                                                value="{{ menu.minimal_pembelian }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editKategoriMenu{{ menu._id }}">Kategori</label>
+                                            <select class="form-control" id="editKategoriMenu{{ menu._id }}"
+                                                name="editKategoriMenu" required>
+                                                <option value="Nasi Kotak" {% if menu.kategori=='Nasi Kotak'
+                                                    %}selected{% endif %}>Nasi Kotak</option>
+                                                <option value="Snack Box" {% if menu.kategori=='Snack Box' %}selected{%
+                                                    endif %}>Snack Box</option>
+                                                <option value="Prasmanan" {% if menu.kategori=='Prasmanan' %}selected{%
+                                                    endif %}>Prasmanan</option>
+                                                <option value="Tumpeng" {% if menu.kategori=='Tumpeng' %}selected{%
+                                                    endif %}>Tumpeng</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editGambarMenu{{ menu._id }}">Gambar Menu</label>
+                                            <input type="file" class="form-control-file"
+                                                id="editGambarMenu{{ menu._id }}" name="editGambarMenu"
+                                                accept="image/*">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center">Belum ada menu yang ditambahkan.</p>
+        <!-- Atau bisa ditampilkan gambar placeholder -->
+        <div class="text-center">
+            <img src="{{url_for('static', filename='img/empty_data_icon_149938.svg')}}" alt="No Data" height="200">
+            <p class="text-muted">Belum ada menu yang ditambahkan.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#searchInput').on('input', function () {
+            var searchText = $(this).val().toLowerCase();
+            var rows = $('#dataTable tbody tr');
+
+            rows.each(function () {
+                var found = false;
+                var cells = $(this).find('td');
+
+                cells.each(function () {
+                    if ($(this).text().toLowerCase().includes(searchText)) {
+                        found = true;
+                        return false; // Exit the loop early if found
+                    }
+                });
+
+                if (found) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

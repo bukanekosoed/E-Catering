@@ -4,13 +4,16 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 from bson import ObjectId
-
+from models import menus_collection
+from routes.admin import admin_bp
 # Load environment variables
 load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
+app.config['UPLOAD_FOLDER'] = 'static/assets/img/menu'
+app.register_blueprint(admin_bp)
 
 # MongoClient and database initialization
 client = MongoClient(os.getenv('MONGO_URI'))
@@ -21,7 +24,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'auth.login'
 
 users_collection = db['users']
-admins_collection = db['admins']
+admins_collection = db['admin']
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -40,32 +43,34 @@ def load_user(user_id):
 from routes.auth import create_auth_bp  # Import the factory function
 app.register_blueprint(create_auth_bp(users_collection, admins_collection), url_prefix='/auth')
 
+
 @app.before_request
 def before_request():
     # Check if the user is authenticated and redirect based on their role
     if current_user.is_authenticated:
-        if current_user.role == 'user' and request.endpoint == 'admin_dashboard':
+        if current_user.role == 'user' and request.endpoint == 'dashboard':
             flash('Unauthorized access')
-            return redirect(url_for('user_dashboard'))
-        elif current_user.role == 'admin' and request.endpoint == 'user_dashboard':
+            return redirect(url_for('index'))
+        elif current_user.role == 'admin' and request.endpoint == 'index':
             flash('Unauthorized access')
-            return redirect(url_for('admin_dashboard'))
+            return redirect(url_for('admin.dashboard'))
         
 # Routes
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-@app.route('/admin_dashboard')
-@login_required
-def admin_dashboard():
-    return render_template('admin_dashboard.html')
+    menus = list(menus_collection.find({}))
+    categories = menus_collection.distinct('kategori')
+    return render_template('index.html', menus=menus, categories=categories)
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
