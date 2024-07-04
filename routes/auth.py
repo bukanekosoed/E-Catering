@@ -29,7 +29,7 @@ def create_auth_bp(users_collection, admins_collection):
                 login_user(admin_obj)
                 return redirect(url_for('admin.dashboard'))
 
-            flash('Invalid email or password')
+            flash('Invalid email or password','info')
 
         return render_template('auth/login.html')
 
@@ -49,18 +49,18 @@ def create_auth_bp(users_collection, admins_collection):
 
             # Validasi bahwa semua field diisi
             if not email or not name or not phone or not password or not confirm_password:
-                flash('Silakan lengkapi semua kolom.')
+                flash('Silakan lengkapi semua kolom.','danger')
                 return redirect(url_for('auth.register'))
             # Validasi panjang nomor telepon
             elif len(phone) < 10 or len(phone) > 15:  # Sesuaikan panjang yang diinginkan
-                flash('Panjang nomor telepon harus antara 10 dan 15 karakter.')
+                flash('Panjang nomor telepon harus antara 10 dan 15 karakter.','danger')
                 return redirect(url_for('auth.register'))
             # Validasi panjang dan kompleksitas password dengan regex
             elif not re.match(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()-+=]).{8,}$', password):
-                flash('Password harus terdiri dari setidaknya satu angka, satu huruf kecil, satu huruf besar, satu karakter khusus, dan minimal 8 karakter.')
+                flash('Password harus terdiri dari setidaknya satu angka, satu huruf kecil, satu huruf besar, satu karakter khusus, dan minimal 8 karakter.','danger')
                 return redirect(url_for('auth.register'))
             elif password != confirm_password:
-                flash('Passwords do not match')
+                flash('Passwords do not match','danger')
                 return redirect(url_for('auth.register'))
             
             hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -68,7 +68,7 @@ def create_auth_bp(users_collection, admins_collection):
             
 
             if users_collection.find_one({'email': email}):
-                flash('Email already exists')
+                flash('Email already exists','danger')
             else:
                 users_collection.insert_one({
                     'email': email,
@@ -76,7 +76,7 @@ def create_auth_bp(users_collection, admins_collection):
                     'phone': phone,
                     'password': hashed_password
                 })
-                flash('Registration successful. Please log in.')
+                flash('Registration successful. Please log in.','success')
                 return redirect(url_for('auth.login'))
 
         return render_template('auth/register.html')

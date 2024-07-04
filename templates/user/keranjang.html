@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block title %}
+Keranjang
+{% endblock %}
+{% set navbar = True %}
+{% block content %}
+{% if cart_items_count %}
+<section id="cart-section">
+    <div class="container py-5">
+        <h2 class="fw-bold mb-4">Keranjang Saya</h2>
+        <div class="row item">
+            <div class="col-lg-8 col-12 mb-4">
+                {% for item in cart_details.cart_items %}
+                <div class="shadow bg-white rounded-4">
+                    <div class="d-flex mb-3">
+                        <div class="p-3">
+                            <img id="image" src="{{ url_for('static', filename=item.menu_details.gambar[7:]) }}"
+                                alt="{{ item.menu_details.nama }}" width="100" height="100%"
+                                class="rounded-3 object-fit-cover">
+                        </div>
+                        <div class="flex-grow-1 py-3 overflow-hidden ">
+                            <div class="d-block">
+                                <div class="d-flex">
+                                    <div class="px-2">
+                                        <h6 class="text-sm fs-6" id="nama">{{ item.menu_details.nama }}</h6>
+                                        <small id="kategori">{{ item.menu_details.kategori }}</small><br>
+                                    </div>
+                                    <form action="{{url_for('user.delete_menu', menu_id=item.menu_id)}}" method="post"
+                                        class="ms-auto me-3 px-1">
+                                        <button type="submit" class="btn">
+                                            <ion-icon name="trash-outline"
+                                                class="text-bg-danger rounded-circle fs-4 p-1"></ion-icon>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="d-md-flex mt-2 align-items-center px-2">
+                                    <div class="p2 flex-grow-1">
+                                        <small class="text-sm fs-6" id="harga">{{ item.menu_details.harga | format_idr
+                                            }}</small>
+                                        <h6 class="text-sm fs-6" id="total">{{ item.total | format_idr }}</h6>
+                                    </div>
+                                    <div class="mt-2">
+                                        <form action="{{ url_for('user.update_quantity', menu_id=item.menu_id) }}"
+                                            method="post">
+                                            <div class="d-flex justify-content-center">
+                                                <button class="btn" type="submit" name="action" value="decrease">
+                                                    <ion-icon name="remove-outline"
+                                                        class="text-bg-danger rounded-circle fs-4 p-1"></ion-icon>
+                                                </button>
+                                                <input type="hidden" name="menu_id" value="{{ item._id }}">
+                                                <input id="quantity_menu_id" min="0" name="quantity"
+                                                    value="{{ item.quantity }}" type="number"
+                                                    class="form-control form-control-sm w-50 text-center rounded-5" />
+                                                <button class="btn" type="submit" name="action" value="increase">
+                                                    <ion-icon name="add-outline"
+                                                        class="text-bg-primary rounded-circle fs-4 p-1"></ion-icon>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-lg-4 col-12 mb-5">
+                <div class="bg-white p-4 rounded-4 shadow mb-5">
+                    <div class="mb-4">
+                        <div class="mb-3">
+                            <label for="deliveryDate" class="form-label">Pilih Tanggal Pengiriman</label>
+                            <input type="date" class="form-control" id="deliveryDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="deliveryAddress" class="form-label">Alamat Pengiriman</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="province" class="form-label">Provinsi</label>
+                                        <select class="form-select" id="province">
+                                            <option selected>Pilih Provinsi...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="district" class="form-label">Kabupaten/Kota</label>
+                                        <select class="form-select" id="district">
+                                            <option selected>Pilih Kabupaten/Kota...</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="subDistrict" class="form-label">Kecamatan</label>
+                                        <select class="form-select" id="subDistrict">
+                                            <option selected>Pilih Kecamatan...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="village" class="form-label">Desa</label>
+                                        <select class="form-select" id="village">
+                                            <option selected>Pilih Desa...</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="streetAddress" class="form-label">Nama Jalan</label>
+                                        <input type="text" class="form-control" id="streetAddress"
+                                            placeholder="Nama Jalan">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="border-top pt-4">
+                        <div class="d-flex justify-content-between text-lg fw-bold">
+                            <span>Total:</span>
+                            <span id="grandTotal">{{ cart_details.grandTotal | format_idr }}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-100 mt-4 rounded-4 shadow p-3" id="checkout-btn">
+                        <i class="bi bi-bag-check fs-5 mx-2"></i>Checkout ( {{cart_details.cart_items | length}} )
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% else %}
+<section>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Keranjang Kosong</h2>
+                        <p class="text-center text-muted">Tidak ada produk di keranjang Anda.</p>
+                        <div class="text-center mb-4">
+                            <img src="path_to_empty_cart_image" alt="Empty Cart" class="img-fluid h-50 w-50">
+                        </div>
+                        <p class="text-center">Belanja sekarang dan isi keranjang Anda!</p>
+                        <a href="url_to_shop_now" class="btn btn-primary btn-block text-center">Belanja Sekarang</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="your_client_key"></script>
+<script>
+    $(document).ready(function () {
+        $('#checkout-btn').click(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: "{{ url_for('user.checkout') }}",
+                method: 'POST',
+                success: function (data) {
+                    if (data.snap_token) {
+                        snap.pay(data.snap_token, {
+                            onSuccess: function (result) {
+                                console.log('success');
+                                console.log(result);
+                                // Handle success scenario
+                            },
+                            onPending: function (result) {
+                                console.log('pending');
+                                console.log(result);
+                                // Handle pending scenario
+                            },
+                            onError: function (result) {
+                                console.log('error');
+                                console.log(result);
+                                // Handle error scenario
+                            },
+                            onClose: function () {
+                                console.log('customer closed the popup without finishing the payment');
+                                // Handle close scenario
+                            }
+                        });
+                    } else {
+                        console.log('Failed to get snap token');
+                    }
+                },
+                error: function (err) {
+                    console.log('AJAX error');
+                    console.log(err);
+                }
+            });
+        });
+    });
+
+
+    $(document).ready(function () {
+        // Fetch data Provinsi
+        $(document).ready(function () {
+            $.ajax({
+                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json',
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    // Proses data provinsi
+                    const provinceSelect = $('#province');
+                    provinceSelect.empty();
+                    provinceSelect.append('<option selected>Pilih Provinsi...</option>');
+                    $.each(response, function (index, prov) {
+                        if (prov.id === '33') {
+                            provinceSelect.append('<option value="' + prov.id + '">' + prov.name + '</option>');
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching provinsi:', error);
+                }
+            });
+        });
+
+
+        // Fungsi untuk mengambil kabupaten/kota berdasarkan provinsi yang dipilih
+        $('#province').change(function () {
+            var provinceId = $(this).val();
+            $.ajax({
+                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/regencies/' + provinceId + '.json',
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    // Proses data kabupaten/kota
+                    const districtSelect = $('#district');
+                    districtSelect.empty();
+                    districtSelect.append('<option selected>Pilih Kabupaten/Kota...</option>');
+                    $.each(response, function (index, kab) {
+                        if (kab.id === '3329'| kab.id === '3328'| kab.id === '3376') {
+                        districtSelect.append('<option value="' + kab.id + '">' + kab.name + '</option>');}
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching kabupaten/kota:', error);
+                }
+            });
+        });
+
+        // Fungsi untuk mengambil kecamatan berdasarkan kabupaten/kota yang dipilih
+        $('#district').change(function () {
+            var districtId = $(this).val();
+            $.ajax({
+                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/districts/' + districtId + '.json',
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    // Proses data kecamatan
+                    const subDistrictSelect = $('#subDistrict');
+                    subDistrictSelect.empty();
+                    subDistrictSelect.append('<option selected>Pilih Kecamatan...</option>');
+                    $.each(response, function (index, kec) {
+                        subDistrictSelect.append('<option value="' + kec.id + '">' + kec.name + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching kecamatan:', error);
+                }
+            });
+        });
+
+        // // Fungsi untuk mengambil desa berdasarkan kecamatan yang dipilih
+        $('#subDistrict').change(function () {
+            var subDistrictId = $(this).val();
+            $.ajax({
+                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/villages/' + subDistrictId + '.json',
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    // Proses data desa
+                    const villageSelect = $('#village');
+                    villageSelect.empty();
+                    villageSelect.append('<option selected>Pilih Desa...</option>');
+                    $.each(response, function (index, desa) {
+                        villageSelect.append('<option value="' + desa.id + '">' + desa.name + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching desa:', error);
+                }
+            });
+        });
+
+    });
+
+</script>
+
+{% endblock %}

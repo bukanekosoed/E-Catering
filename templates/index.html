@@ -11,11 +11,11 @@ Home
             <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item ratio ratio-21x9 active" data-bs-interval="10000">
-                        <img src="https://placehold.jp/1600x800.png?text=menu+1"
+                        <img src="https://images.unsplash.com/photo-1529566652340-2c41a1eb6d93?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                             class="d-block img-fluid   object-fit-cover " alt="...">
                     </div>
                     <div class="carousel-item ratio ratio-21x9" data-bs-interval="2000">
-                        <img src="https://images.unsplash.com/photo-1681378128359-a5c2492a3535?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        <img src="https://images.unsplash.com/photo-1695712468478-789ccc733903?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                             class="d-block img-fluid object-fit-cover" alt="...">
                     </div>
                 </div>
@@ -134,13 +134,19 @@ Home
                                 style="top: 10px; left: 10px;">Fruits</div> -->
                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                 <h4 class="fw-bold">{{menu.nama}}</h4>
-                                <p>Minumal Pembelian {{menu.minimal_pembelian}}</p>
+                                <p>Minimal Pembelian {{menu.minimal_pembelian}}</p>
                                 <div
                                     class="d-lg-flex justify-content-between d-block justify-content-center align-items-center">
-                                    <strong>{{ menu.harga }}</strong>
-                                    <a class="btn border border-secondary rounded-pill px-3 btn-secondary  mt-3"
-                                        onclick="addToCart('{{ menu._id }}')"><ion-icon name="bag-add-outline"></ion-icon>
-                                        Keranjang</a>
+                                    <strong>{{ menu.harga | format_idr }}</strong>
+                                    <form method="POST" action="{{ url_for('user.add_to_cart', menu_id=menu._id) }}">
+                                        <input type="hidden" name="menu_id" value="{{ menu._id }}">
+                                        <button type="submit"
+                                            class="btn border border-secondary rounded-pill px-3 btn-secondary mt-3">
+                                            <ion-icon name="bag-add-outline"></ion-icon>
+                                            Keranjang
+                                        </button>
+                                    </form>
+
                                 </div>
                             </div>
                         </div>
@@ -162,13 +168,18 @@ Home
                             </div>
                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                 <h4 class="fw-bold">{{menu.nama}}</h4>
-                                <p>Minumal Pembelian {{menu.minimal_pembelian}}</p>
+                                <p>Minimal Pembelian {{menu.minimal_pembelian}}</p>
                                 <div
                                     class="d-lg-flex justify-content-between d-block justify-content-center align-items-center">
-                                    <strong>{{ menu.harga }}</strong>
-                                    <a class="btn border border-secondary rounded-pill px-3 btn-secondary mt-3">
-                                        <ion-icon name="bag-add-outline"></ion-icon>
-                                        Keranjang</a>
+                                    <strong>{{ menu.harga | format_idr }}</strong>
+                                    <form method="POST" action="{{ url_for('user.add_to_cart', menu_id=menu._id) }}">
+                                        <input type="hidden" name="menu_id" value="{{ menu._id }}">
+                                        <button type="submit"
+                                            class="btn border border-secondary rounded-pill px-3 btn-secondary mt-3">
+                                            <ion-icon name="bag-add-outline"></ion-icon>
+                                            Keranjang
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

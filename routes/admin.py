@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
 from functools import wraps
-from models import menus_collection
+from models import menus_collection,carts_collection
 from werkzeug.utils import secure_filename
 import os
 from bson import ObjectId
@@ -65,7 +65,7 @@ def add_menu():
             }
             menus_collection.insert_one(menu_item)
 
-            flash('Menu item added successfully!')
+            flash('Menu Berhasil Di Tambahkan')
             return redirect(url_for('admin.add_menu'))
     menu_count = menus_collection.count_documents({})
     menus = menus_collection.find()
@@ -81,9 +81,13 @@ def delete_menu(menu_id):
         
         # Delete the menu item from MongoDB
         menus_collection.delete_one({'_id': ObjectId(menu_id)})
-        flash('Menu item deleted successfully!')
+        flash('Menu Telah Terhapus')
+        carts_collection.update_many(
+            {'cart_items.menu_id': menu_id},
+            {'$pull': {'cart_items': {'menu_id': menu_id}}}
+        )
     else:
-        flash('Menu item not found!')
+        flash('Menu Tidak Ditemukan')
 
     return redirect(url_for('admin.add_menu'))
 

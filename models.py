@@ -12,5 +12,7 @@ class User(UserMixin):
         self.email = email
         self.role = role
     
-
+users_collection = db['users']
+admins_collection = db['admin']
 menus_collection = db['menus']
+carts_collection = db['keranjang']
