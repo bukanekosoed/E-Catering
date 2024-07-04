@@ -173,7 +173,7 @@ Keranjang
                             onSuccess: function (result) {
                                 console.log('success');
                                 console.log(result);
-                                // Handle success scenario
+                                window.location.href = "{{ url_for('user.get_orders') }}";
                             },
                             onPending: function (result) {
                                 console.log('pending');

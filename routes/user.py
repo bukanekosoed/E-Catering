@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, flash, render_template,jsonify
 from flask_login import login_required, current_user
-from models import carts_collection,menus_collection,users_collection
+from models import carts_collection,menus_collection,users_collection,orders_collection
 from bson import ObjectId
 from midtransclient import Snap
 import uuid
@@ -104,10 +104,12 @@ def delete_menu(menu_id):
 def checkout():
     current_datetime = datetime.datetime.now()
     formatted_datetime = current_datetime.strftime('%Y-%m-%d')
+
     if current_user.is_authenticated:
         user_id = current_user.id
         user = users_collection.find_one({'_id': ObjectId(user_id)})
         cart = carts_collection.find_one({'user_id': user_id})
+
         if cart:
             cart['_id'] = str(cart['_id'])  # Convert ObjectId to string
             
@@ -135,7 +137,7 @@ def checkout():
                         'quantity': item['quantity'],
                         'name': menu_details['nama']
                     })
-            
+
             # Assign grandTotal to cart
             cart['grandTotal'] = grandTotal
 
@@ -162,12 +164,46 @@ def checkout():
             try:
                 # Create Snap token
                 snap_token = midtrans_client.create_transaction(transaction_details)['token']
+
+                # Simpan pesanan ke dalam database
+                order_data = {
+                    'user_id': user_id,
+                    'order_id': transaction_details['transaction_details']['order_id'],
+                    'order_date': current_datetime,
+                    'items': cart['cart_items'],
+                    'total_amount': cart['grandTotal']
+                }
+                orders_collection.insert_one(order_data)
+
+                # Hapus isi keranjang belanja setelah checkout
+                carts_collection.delete_one({'user_id': user_id})
+
                 return jsonify({'snap_token': snap_token}), 200
+
             except Exception as e:
                 print(f"Error: {str(e)}")
                 return jsonify({'error': 'Failed to initiate payment'}), 500
-        
+
     return jsonify({'error': 'Cart not found'}), 404
+
+
+@user_bp.route('/orders', methods=['GET'])
+@login_required
+def get_orders():
+    user_id = current_user.id
+    orders = list(orders_collection.find({'user_id': user_id}))
+
+    formatted_orders = []
+    for order in orders:
+        formatted_order = {
+            'order_id': order['order_id'],
+            'order_date': order['order_date'],
+            'total_amount': order['total_amount']
+        }
+        formatted_orders.append(formatted_order)
+
+    return render_template('user/pesanan.html', orders=formatted_orders)
+
 
 def get_cart_items_count():
     if current_user.is_authenticated:
