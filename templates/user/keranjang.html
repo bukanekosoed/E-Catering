@@ -161,12 +161,40 @@ Keranjang
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
     data-client-key="your_client_key"></script>
 <script>
+    // Mendapatkan elemen input tanggal
+    var deliveryDateInput = document.getElementById('deliveryDate');
+    var today = new Date();
+    var threeDaysAhead = new Date();
+    threeDaysAhead.setDate(today.getDate() + 3);
+    var formattedThreeDaysAhead = threeDaysAhead.toISOString().split('T')[0];
+
+    // Set nilai min pada input tanggal
+    deliveryDateInput.setAttribute('min', formattedThreeDaysAhead);
     $(document).ready(function () {
         $('#checkout-btn').click(function (event) {
             event.preventDefault();
+            var deliveryDate = $('#deliveryDate').val();
+            var province = $('#province option:selected').text(); // Mengambil teks opsi yang dipilih
+            var district = $('#district option:selected').text(); // Mengambil teks opsi yang dipilih
+            var subDistrict = $('#subDistrict option:selected').text(); // Mengambil teks opsi yang dipilih
+            var village = $('#village option:selected').text(); // Mengambil teks opsi yang dipilih
+            var streetAddress = $('#streetAddress').val();
+
+
+            // Data yang akan dikirimkan
+            var formData = {
+                'deliveryDate': deliveryDate,
+                'province': province,
+                'district': district,
+                'subDistrict': subDistrict,
+                'village': village,
+                'streetAddress': streetAddress
+            };
+
             $.ajax({
                 url: "{{ url_for('user.checkout') }}",
                 method: 'POST',
+                data: formData,
                 success: function (data) {
                     if (data.snap_token) {
                         snap.pay(data.snap_token, {
@@ -241,8 +269,9 @@ Keranjang
                     districtSelect.empty();
                     districtSelect.append('<option selected>Pilih Kabupaten/Kota...</option>');
                     $.each(response, function (index, kab) {
-                        if (kab.id === '3329'| kab.id === '3328'| kab.id === '3376') {
-                        districtSelect.append('<option value="' + kab.id + '">' + kab.name + '</option>');}
+                        if (kab.id === '3329' | kab.id === '3328' | kab.id === '3376') {
+                            districtSelect.append('<option value="' + kab.id + '">' + kab.name + '</option>');
+                        }
                     });
                 },
                 error: function (xhr, status, error) {

@@ -104,7 +104,14 @@ def delete_menu(menu_id):
 def checkout():
     current_datetime = datetime.datetime.now()
     formatted_datetime = current_datetime.strftime('%Y-%m-%d')
-
+    delivery_date = request.form.get('deliveryDate')
+    delivery_address = {
+        'province': request.form.get('province'),
+        'district': request.form.get('district'),
+        'sub_district': request.form.get('subDistrict'),
+        'village': request.form.get('village'),
+        'street_address': request.form.get('streetAddress')
+    }
     if current_user.is_authenticated:
         user_id = current_user.id
         user = users_collection.find_one({'_id': ObjectId(user_id)})
@@ -145,13 +152,33 @@ def checkout():
             customer_details = {
                 'first_name': user['name'],
                 'email': user['email'],
-                'phone': user['phone']  # Sesuaikan dengan atribut yang sesuai
+                'phone': user['phone'],
+                "billing_address": {
+                    "first_name": user['name'],
+                    "email": user['email'],
+                    "phone": user['phone'],
+                    "address": delivery_address['street_address'],
+                    "city": delivery_address['district'],
+                    "postal_code": "12190",
+                    "country_code": "IDN"
+                },
+                "shipping_address": {
+                    "first_name": "TEST",
+                    "last_name": "MIDTRANSER",
+                    "email": "test@midtrans.com",
+                    "phone": "0 8128-75 7-9338",
+                    "address": "Sudirman",
+                    "city": "Jakarta",
+                    "postal_code": "12190",
+                    "country_code": "IDN"
+                }
+  # Sesuaikan dengan atribut yang sesuai
             }
 
             # Create transaction token using Snap API
             transaction_details = {
                 'transaction_details': {
-                    'order_id': f'LanggengCatering-{uuid.uuid4().hex[:4]}-{formatted_datetime}',
+                    'order_id': f'LanggengCatering/{uuid.uuid4().hex[:8]}/{formatted_datetime}',
                     'gross_amount': int(cart['grandTotal'])
                 },
                 'item_details': item_details,
@@ -171,7 +198,8 @@ def checkout():
                     'order_id': transaction_details['transaction_details']['order_id'],
                     'order_date': current_datetime,
                     'items': cart['cart_items'],
-                    'total_amount': cart['grandTotal']
+                    'total_amount': cart['grandTotal'],
+                    'status': 'pending',
                 }
                 orders_collection.insert_one(order_data)
 
@@ -192,7 +220,7 @@ def checkout():
 def get_orders():
     user_id = current_user.id
     orders = list(orders_collection.find({'user_id': user_id}))
-
+    
     formatted_orders = []
     for order in orders:
         formatted_order = {
