@@ -15,6 +15,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
+  # Sesuaikan dengan domain Ngrok Anda
 app.secret_key = os.getenv('SECRET_KEY')
 app.config['UPLOAD_FOLDER'] = 'static/assets/img/menu'
 app.register_blueprint(admin_bp)

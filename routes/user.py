@@ -1,4 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, flash, render_template,jsonify
+import requests
+from requests.auth import HTTPBasicAuth
 from flask_login import login_required, current_user
 from models import carts_collection,menus_collection,users_collection,orders_collection
 from bson import ObjectId
@@ -8,9 +10,10 @@ import datetime
 
 user_bp = Blueprint('user', __name__)
 
+MIDTRANS_SERVER_KEY = 'SB-Mid-server-z8FSfLzdnI_a7iqoVorBidcJ'
 midtrans_client = Snap(
     is_production=False,
-    server_key='SB-Mid-server-z8FSfLzdnI_a7iqoVorBidcJ',
+    server_key=MIDTRANS_SERVER_KEY,
     client_key='SB-Mid-client-ZeSro0aAvX_ctrEe'
 )
 
@@ -110,6 +113,7 @@ def checkout():
         'district': request.form.get('district'),
         'sub_district': request.form.get('subDistrict'),
         'village': request.form.get('village'),
+        'zipcode': request.form.get('zipcode'),
         'street_address': request.form.get('streetAddress')
     }
     if current_user.is_authenticated:
@@ -157,22 +161,16 @@ def checkout():
                     "first_name": user['name'],
                     "email": user['email'],
                     "phone": user['phone'],
-                    "address": delivery_address['street_address'],
-                    "city": delivery_address['district'],
-                    "postal_code": "12190",
-                    "country_code": "IDN"
                 },
                 "shipping_address": {
-                    "first_name": "TEST",
-                    "last_name": "MIDTRANSER",
-                    "email": "test@midtrans.com",
-                    "phone": "0 8128-75 7-9338",
-                    "address": "Sudirman",
-                    "city": "Jakarta",
-                    "postal_code": "12190",
+                    "first_name": user['name'],
+                    "email": user['email'],
+                    "phone": user['phone'],
+                    "address": f'{delivery_address["street_address"]}, {delivery_address["village"]},',
+                    "city": f'{delivery_address["sub_district"]}, {delivery_address["district"]}, {delivery_address["province"]}',
+                    "postal_code": delivery_address['zipcode'],
                     "country_code": "IDN"
                 }
-  # Sesuaikan dengan atribut yang sesuai
             }
 
             # Create transaction token using Snap API
@@ -185,6 +183,10 @@ def checkout():
                 'customer_details': customer_details,
                 'credit_card': {
                     'secure': True
+                },
+                "callbacks": {
+                    "finish": "{{url_for('user.orders')}}",
+                    "error": "https://your-domain.com/midtrans/error"
                 }
             }
 
@@ -192,18 +194,6 @@ def checkout():
                 # Create Snap token
                 snap_token = midtrans_client.create_transaction(transaction_details)['token']
 
-                # Simpan pesanan ke dalam database
-                order_data = {
-                    'user_id': user_id,
-                    'order_id': transaction_details['transaction_details']['order_id'],
-                    'order_date': current_datetime,
-                    'items': cart['cart_items'],
-                    'total_amount': cart['grandTotal'],
-                    'status': 'pending',
-                }
-                orders_collection.insert_one(order_data)
-
-                # Hapus isi keranjang belanja setelah checkout
                 carts_collection.delete_one({'user_id': user_id})
 
                 return jsonify({'snap_token': snap_token}), 200
@@ -215,22 +205,44 @@ def checkout():
     return jsonify({'error': 'Cart not found'}), 404
 
 
-@user_bp.route('/orders', methods=['GET'])
-@login_required
-def get_orders():
-    user_id = current_user.id
-    orders = list(orders_collection.find({'user_id': user_id}))
-    
-    formatted_orders = []
-    for order in orders:
-        formatted_order = {
-            'order_id': order['order_id'],
-            'order_date': order['order_date'],
-            'total_amount': order['total_amount']
-        }
-        formatted_orders.append(formatted_order)
+@user_bp.route('/midtrans_webhook', methods=['POST'])
+def midtrans_webhook():
 
-    return render_template('user/pesanan.html', orders=formatted_orders)
+    webhook_data = request.get_json()
+
+    # Proses data dari webhook Midtrans
+    
+    order_id = webhook_data['order_id']
+    current_datetime = datetime.datetime.now()
+    gross_amount = webhook_data['gross_amount']
+    transaction_status = webhook_data['transaction_status']
+
+    # Prepare data to be saved
+    order_data = {
+        
+        'order_id': order_id,
+        'order_date': current_datetime,
+        'total_amount': gross_amount,
+        'payment_status': transaction_status
+    }
+
+    # Update MongoDB with order data
+    orders_collection.update_one(
+        {"order_id": order_id},
+        {"$set": order_data},
+        upsert=True
+    )
+
+
+    return jsonify({"message": "Webhook received"}), 200
+
+
+
+@user_bp.route('/orders', methods=['GET'])
+def get_order():
+    orders = orders_collection.find({})
+    return render_template('user/pesanan.html',orders=orders)
+
 
 
 def get_cart_items_count():

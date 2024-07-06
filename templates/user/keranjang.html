@@ -107,6 +107,12 @@ Keranjang
                                             <option selected>Pilih Desa...</option>
                                         </select>
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="zipcode" class="form-label">Kode Pos</label>
+                                        <select class="form-select" id="zipcode">
+                                            <option selected>Pilih Kode Pos...</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="col-12">
@@ -178,6 +184,7 @@ Keranjang
             var district = $('#district option:selected').text(); // Mengambil teks opsi yang dipilih
             var subDistrict = $('#subDistrict option:selected').text(); // Mengambil teks opsi yang dipilih
             var village = $('#village option:selected').text(); // Mengambil teks opsi yang dipilih
+            var zipcode = $('#zipcode option:selected').text(); // Mengambil teks opsi yang dipilih
             var streetAddress = $('#streetAddress').val();
 
 
@@ -188,9 +195,10 @@ Keranjang
                 'district': district,
                 'subDistrict': subDistrict,
                 'village': village,
-                'streetAddress': streetAddress
+                'streetAddress': streetAddress,
+                'zipcode': zipcode
             };
-
+            
             $.ajax({
                 url: "{{ url_for('user.checkout') }}",
                 method: 'POST',
@@ -201,7 +209,7 @@ Keranjang
                             onSuccess: function (result) {
                                 console.log('success');
                                 console.log(result);
-                                window.location.href = "{{ url_for('user.get_orders') }}";
+                                window.location.href = "{{ url_for('user.get_order') }}";
                             },
                             onPending: function (result) {
                                 console.log('pending');
@@ -215,7 +223,7 @@ Keranjang
                             },
                             onClose: function () {
                                 console.log('customer closed the popup without finishing the payment');
-                                // Handle close scenario
+                                window.location.href = "{{ url_for('user.get_order') }}";
                             }
                         });
                     } else {
@@ -232,10 +240,11 @@ Keranjang
 
 
     $(document).ready(function () {
+        var url = 'https://alamat.thecloudalert.com/api/'
         // Fetch data Provinsi
         $(document).ready(function () {
             $.ajax({
-                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json',
+                url: url + 'provinsi/get/',
                 type: 'GET',
                 success: function (response) {
                     console.log(response);
@@ -243,9 +252,10 @@ Keranjang
                     const provinceSelect = $('#province');
                     provinceSelect.empty();
                     provinceSelect.append('<option selected>Pilih Provinsi...</option>');
-                    $.each(response, function (index, prov) {
-                        if (prov.id === '33') {
-                            provinceSelect.append('<option value="' + prov.id + '">' + prov.name + '</option>');
+                    // Loop through each item in the 'result' array
+                    $.each(response.result, function (index, prov) {
+                        if (prov.id == 10){
+                            provinceSelect.append('<option value="' + prov.id + '">' + prov.text + '</option>');
                         }
                     });
                 },
@@ -260,7 +270,7 @@ Keranjang
         $('#province').change(function () {
             var provinceId = $(this).val();
             $.ajax({
-                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/regencies/' + provinceId + '.json',
+                url: url + 'kabkota/get/?d_provinsi_id' + provinceId,
                 type: 'GET',
                 success: function (response) {
                     console.log(response);
@@ -268,9 +278,9 @@ Keranjang
                     const districtSelect = $('#district');
                     districtSelect.empty();
                     districtSelect.append('<option selected>Pilih Kabupaten/Kota...</option>');
-                    $.each(response, function (index, kab) {
-                        if (kab.id === '3329' | kab.id === '3328' | kab.id === '3376') {
-                            districtSelect.append('<option value="' + kab.id + '">' + kab.name + '</option>');
+                    $.each(response.result, function (index, kab) {
+                        if (kab.id === '95' | kab.id === '120' | kab.id === '121') {
+                            districtSelect.append('<option value="' + kab.id + '">' + kab.text + '</option>');
                         }
                     });
                 },
@@ -284,7 +294,7 @@ Keranjang
         $('#district').change(function () {
             var districtId = $(this).val();
             $.ajax({
-                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/districts/' + districtId + '.json',
+                url: url + 'kecamatan/get/?d_kabkota_id=' + districtId,
                 type: 'GET',
                 success: function (response) {
                     console.log(response);
@@ -292,8 +302,8 @@ Keranjang
                     const subDistrictSelect = $('#subDistrict');
                     subDistrictSelect.empty();
                     subDistrictSelect.append('<option selected>Pilih Kecamatan...</option>');
-                    $.each(response, function (index, kec) {
-                        subDistrictSelect.append('<option value="' + kec.id + '">' + kec.name + '</option>');
+                    $.each(response.result, function (index, kec) {
+                        subDistrictSelect.append('<option value="' + kec.id + '">' + kec.text + '</option>');
                     });
                 },
                 error: function (xhr, status, error) {
@@ -306,7 +316,7 @@ Keranjang
         $('#subDistrict').change(function () {
             var subDistrictId = $(this).val();
             $.ajax({
-                url: 'https://www.emsifa.com/api-wilayah-indonesia/api/villages/' + subDistrictId + '.json',
+                url: url + 'kelurahan/get/?d_kecamatan_id=' + subDistrictId,
                 type: 'GET',
                 success: function (response) {
                     console.log(response);
@@ -314,8 +324,8 @@ Keranjang
                     const villageSelect = $('#village');
                     villageSelect.empty();
                     villageSelect.append('<option selected>Pilih Desa...</option>');
-                    $.each(response, function (index, desa) {
-                        villageSelect.append('<option value="' + desa.id + '">' + desa.name + '</option>');
+                    $.each(response.result, function (index, desa) {
+                        villageSelect.append('<option value="' + desa.id + '">' + desa.text + '</option>');
                     });
                 },
                 error: function (xhr, status, error) {
@@ -323,7 +333,28 @@ Keranjang
                 }
             });
         });
+        $('#subDistrict').change(function () {
+            var subDistrictId = $(this).val();
+            var districtId = $('#district').val()
+            $.ajax({
+                url: url + 'kodepos/get/?d_kabkota_id=' + districtId + '&d_kecamatan_id=' + subDistrictId,
 
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    // Proses data desa
+                    const villageSelect = $('#zipcode');
+                    villageSelect.empty();
+                    villageSelect.append('<option selected>Pilih Kode Pos...</option>');
+                    $.each(response.result, function (index, kodepos) {
+                        villageSelect.append('<option value="' + kodepos.id + '">' + kodepos.text + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching desa:', error);
+                }
+            });
+        });
     });
 
 </script>
