@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
 from functools import wraps
-from models import menus_collection,carts_collection
+from models import menus_collection,carts_collection,orders_collection
 from werkzeug.utils import secure_filename
 import os
 from bson import ObjectId
@@ -29,6 +29,7 @@ def admin_required(f):
 @admin_required
 @login_required
 def dashboard():
+    order = orders_collection()
     return render_template('admin/dashboard.html')
 
 @admin_bp.route('/add_menu', methods=['GET', 'POST'])
@@ -86,6 +87,7 @@ def delete_menu(menu_id):
             {'cart_items.menu_id': menu_id},
             {'$pull': {'cart_items': {'menu_id': menu_id}}}
         )
+        
     else:
         flash('Menu Tidak Ditemukan')
 

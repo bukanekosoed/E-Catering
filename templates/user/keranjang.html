@@ -151,7 +151,7 @@ Keranjang
                         <h2 class="card-title text-center mb-4">Keranjang Kosong</h2>
                         <p class="text-center text-muted">Tidak ada produk di keranjang Anda.</p>
                         <div class="text-center mb-4">
-                            <img src="path_to_empty_cart_image" alt="Empty Cart" class="img-fluid h-50 w-50">
+                            <img src="{{url_for('static',filename='assets/img/svg/empty-cart.svg')}}" alt="Empty Cart" class="img-fluid h-25 w-25">
                         </div>
                         <p class="text-center">Belanja sekarang dan isi keranjang Anda!</p>
                         <a href="url_to_shop_now" class="btn btn-primary btn-block text-center">Belanja Sekarang</a>
@@ -165,7 +165,7 @@ Keranjang
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-    data-client-key="your_client_key"></script>
+    data-client-key="client_key"></script>
 <script>
     // Mendapatkan elemen input tanggal
     var deliveryDateInput = document.getElementById('deliveryDate');
@@ -214,7 +214,7 @@ Keranjang
                             onPending: function (result) {
                                 console.log('pending');
                                 console.log(result);
-                                // Handle pending scenario
+                                window.location.href = "{{ url_for('user.get_order') }}";
                             },
                             onError: function (result) {
                                 console.log('error');
@@ -223,7 +223,7 @@ Keranjang
                             },
                             onClose: function () {
                                 console.log('customer closed the popup without finishing the payment');
-                                window.location.href = "{{ url_for('user.get_order') }}";
+                                window.location.href = "{{ url_for('user.keranjang') }}";
                             }
                         });
                     } else {
@@ -247,7 +247,6 @@ Keranjang
                 url: url + 'provinsi/get/',
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
                     // Proses data provinsi
                     const provinceSelect = $('#province');
                     provinceSelect.empty();
@@ -273,8 +272,6 @@ Keranjang
                 url: url + 'kabkota/get/?d_provinsi_id' + provinceId,
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
-                    // Proses data kabupaten/kota
                     const districtSelect = $('#district');
                     districtSelect.empty();
                     districtSelect.append('<option selected>Pilih Kabupaten/Kota...</option>');
@@ -297,7 +294,7 @@ Keranjang
                 url: url + 'kecamatan/get/?d_kabkota_id=' + districtId,
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
+                    
                     // Proses data kecamatan
                     const subDistrictSelect = $('#subDistrict');
                     subDistrictSelect.empty();
@@ -319,8 +316,7 @@ Keranjang
                 url: url + 'kelurahan/get/?d_kecamatan_id=' + subDistrictId,
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
-                    // Proses data desa
+                    
                     const villageSelect = $('#village');
                     villageSelect.empty();
                     villageSelect.append('<option selected>Pilih Desa...</option>');
@@ -341,8 +337,7 @@ Keranjang
 
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
-                    // Proses data desa
+                    
                     const villageSelect = $('#zipcode');
                     villageSelect.empty();
                     villageSelect.append('<option selected>Pilih Kode Pos...</option>');

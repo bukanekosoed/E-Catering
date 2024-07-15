@@ -1,51 +1,28 @@
-from flask import Flask, request, jsonify
-from midtransclient import CoreApi
-from pymongo import MongoClient
-from models import orders_collection
-app = Flask(__name__)
+import requests
 
-# Konfigurasi MongoDB
-client = MongoClient('mongodb://localhost:27017')
-db = client.nama_database  # Ganti dengan nama database yang sesuai
-orders_collection  # Ganti dengan nama koleksi yang sesuai
+def get_midtrans_snap(order_id):
+    snap_url = f"https://app.midtrans.com/snap/v1/transactions/{order_id}"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Basic U0ItTWlkLXNlcnZlci16OEZTZkx6ZG5JX2E3aXFvVm9yQmlkY0o6TWFwaW5haDMxKys="
+    }
 
-# Inisialisasi API client Midtrans
-api_client = CoreApi(
-    is_production=False,
-    server_key='SB-Mid-server-z8FSfLzdnI_a7iqoVorBidcJ',
-    client_key='SB-Mid-client-ZeSro0aAvX_ctrEe'
-)
+    response = requests.get(snap_url, headers=headers)
 
-@app.route('/midtrans/notification', methods=['POST'])
-def midtrans_notification():
-    notification_data = request.get_json()
+    if response.status_code == 200:
+        # Response JSON contains the Snap URL and other transaction details
+        snap_response = response.json()
+        return snap_response['redirect_url']  # This URL should be used to redirect user to Snap
 
-    # Handle notification JSON sent by Midtrans, it auto verifies it by doing get status
-    status_response = api_client.transactions.notification(notification_data)
+    return None  # Handle error cases or invalid responses
 
-    order_id = status_response['order_id']
-    transaction_status = status_response['transaction_status']
-    fraud_status = status_response['fraud_status']
+# Usage example:
+order_id = "LanggengCatering-030fc3c9-2024-07-08"
+snap_url = get_midtrans_snap(order_id)
 
-    print('Transaction notification received. Order ID: {0}. Transaction status: {1}. Fraud status: {2}'.format(
-        order_id, transaction_status, fraud_status))
-
-    # Sample transaction_status handling logic
-    if transaction_status == 'capture':
-        if fraud_status == 'challenge':
-            # TODO: set transaction status on your database to 'challenge'
-            pass
-        elif fraud_status == 'accept':
-            # TODO: set transaction status on your database to 'success'
-            pass
-    elif transaction_status in ['cancel', 'deny', 'expire']:
-        # TODO: set transaction status on your database to 'failure'
-        pass
-    elif transaction_status == 'pending':
-        # TODO: set transaction status on your database to 'pending' / waiting payment
-        pass
-
-    return jsonify({'status': 'OK'}), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if snap_url:
+    # Redirect user to the Snap Midtrans payment page
+    print(f"Redirecting user to Midtrans payment page: {snap_url}")
+    # In a web application, you would typically return a redirect response to this URL
+else:
+    print("Failed to retrieve Snap URL from Midtrans API")

@@ -54,7 +54,14 @@ def get_cart_items_count():
     return cart_items_count
 
 def format_idr(angka):
-    return f'Rp {angka:,}'.replace(',', '.')
+    try:
+        # Ubah angka menjadi float untuk memastikan dapat ditangani oleh format()
+        angka = float(angka)
+        # Gunakan format() untuk memformat angka sebagai mata uang IDR
+        return f'Rp {format(angka, ",.0f")}'.replace(',', '.')
+    except ValueError:
+        return 'Rp 0'  # Mengembalikan nilai default jika terjadi kesalahan
+
 
 app.jinja_env.filters['format_idr'] = format_idr
 

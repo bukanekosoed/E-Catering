@@ -31,8 +31,8 @@
                         href="{{ url_for('index') }}">Home</a>
                 </li>
                 <li class="nav-item mx-4">
-                    <a class="nav-link"
-                        href="">Menu</a>
+                    <a class="nav-link {% if request.path == url_for('user.menu') %} fw-bold text-primary active{% endif %}"
+                    href="{{ url_for('user.menu') }}">Menu</a>
                 </li>
                 <li class="nav-item mx-4">
                     <a class="nav-link " href="">Galeri</a>
@@ -58,7 +58,7 @@
 
                 <div class="dropdown ms-2 d-none d-lg-flex">
                     <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://via.placeholder.com/150" alt="" width="30">
+                        <img  src="https://avatar.iran.liara.run/public" alt="" width="30">
                     </button>
                     <ul class="dropdown-menu rounded-3 me-5 shadow w-100" data-bs-theme="light">
                         <li><a class="dropdown-item rounded-2 text-decoration-none" href=""><ion-icon name="person-outline"></ion-icon></i> Akun
@@ -96,9 +96,10 @@
                 <div class="row">
                     <a class="nav-link col text-center p-2 p-md-3 {% if request.path == url_for('index') %}active fw-bold text-white bg-primary rounded-4 {% endif %}"
                         href="{{ url_for('index') }}"><ion-icon name="home-outline" class="fs-3"></ion-icon></a>
-                    <a class="nav-link col text-center p-2 p-md-3"
+                    <a class="nav-link col text-center p-2 p-md-3 {% if request.path == url_for('user.menu') %}active fw-bold text-white bg-primary rounded-4 {% endif %}"
+                    href="{{ url_for('user.menu') }}"
                         href=""><ion-icon name="fast-food-outline" class="fs-3"></ion-icon></a>
-                    <a class="nav-link col text-center p-2 p-md-3" href=""><ion-icon name="receipt-outline" class="fs-3"></ion-icon></a>
+                    <a class="nav-link col text-center p-2 p-md-3 {% if request.path == url_for('user.get_order') %}active fw-bold text-white bg-primary rounded-4 {% endif %}" href="{{ url_for('user.get_order') }}"><ion-icon name="receipt-outline" class="fs-3"></ion-icon></a>
                     <a class="nav-link col text-center p-2 p-md-3"
                         aria-current="page" href=""><ion-icon name="person-outline" class="fs-3"></ion-icon></i></a>
                 </div>
