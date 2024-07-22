@@ -14,16 +14,16 @@ Keranjang
                 <div class="shadow bg-white rounded-4">
                     <div class="d-flex mb-3">
                         <div class="p-3">
-                            <img id="image" src="{{ url_for('static', filename=item.menu_details.gambar[7:]) }}"
-                                alt="{{ item.menu_details.nama }}" width="100" height="100%"
+                            <img id="image" src="{{ url_for('static', filename=item.gambar[7:]) }}"
+                                alt="{{ item.nama }}" width="100" height="100%"
                                 class="rounded-3 object-fit-cover">
                         </div>
                         <div class="flex-grow-1 py-3 overflow-hidden ">
                             <div class="d-block">
                                 <div class="d-flex">
                                     <div class="px-2">
-                                        <h6 class="text-sm fs-6" id="nama">{{ item.menu_details.nama }}</h6>
-                                        <small id="kategori">{{ item.menu_details.kategori }}</small><br>
+                                        <h6 class="text-sm fs-6" id="nama">{{ item.nama }}</h6>
+                                        <small id="kategori">{{ item.kategori }}</small><br>
                                     </div>
                                     <form action="{{url_for('user.delete_menu', menu_id=item.menu_id)}}" method="post"
                                         class="ms-auto me-3 px-1">
@@ -35,7 +35,7 @@ Keranjang
                                 </div>
                                 <div class="d-md-flex mt-2 align-items-center px-2">
                                     <div class="p2 flex-grow-1">
-                                        <small class="text-sm fs-6" id="harga">{{ item.menu_details.harga | format_idr
+                                        <small class="text-sm fs-6" id="harga">{{ item.harga | format_idr
                                             }}</small>
                                         <h6 class="text-sm fs-6" id="total">{{ item.total | format_idr }}</h6>
                                     </div>

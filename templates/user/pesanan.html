@@ -8,78 +8,76 @@ Pesanan
 <section>
     <div class="container py-5">
         <h2 class="fw-bold mb-4">Pesanan Saya</h2>
+        {% for orders in orders %}
         <div class="row">
             <div class="col">
-                {% for order in orders %}
                 <div class="shadow bg-white rounded-4 mb-3">
                     <!-- Tampilkan informasi pesanan -->
                     <div class="d-block p-4">
                         <div class="d-md-flex">
-                            <h5 class="fw-bold">{{ order.order_id }}</h5>
-                            <p id="payment-status-{{ order.order_id }}" class="ms-3 badge rounded-pill fs-6 ms-auto
-                                    {% if order.payment_status == 'pending' %}
-                                        bg-warning
-                                    {% elif order.payment_status == 'settlement' %}
-                                        bg-primary 
-                                    {% else %}
-                                        bg-danger
-                                    {% endif %}
+                            <h5 class="fw-bold">{{ orders.order_id }}</h5>
+                            <p id="payment-status-{{ orders.order_id }}" class="ms-3 badge rounded-pill fs-6 ms-auto
+                                {% if orders.payment_status == 'pending' %}
+                                    bg-warning
+                                {% elif orders.payment_status == 'settlement' %}
+                                    bg-primary 
+                                {% else %}
+                                    bg-danger
+                                {% endif %}
                                 ">
                                 <ion-icon
-                                    name="{% if order.payment_status == 'pending' %}time{% elif order.payment_status == 'settlement' %}checkmark-circle{% else %}close-circle{% endif %}"
+                                    name="{% if orders.payment_status == 'pending' %}time{% elif orders.payment_status == 'settlement' %}checkmark-circle{% else %}close-circle{% endif %}"
                                     class="me-1"></ion-icon>
 
-                                {% if order.payment_status == 'pending' %}
-                                <span class="countdown" data-expiry-time="{{ order.expiry_time }}"></span>
+                                {% if orders.payment_status == 'pending' %}
+                                <span class="countdown" data-expiry-time="{{ orders.expiry_time }}"></span>
                                 {% else %}
-                                <span>{{ order.payment_status }}</span>
+                                <span>{{ orders.payment_status }}</span>
                                 {% endif %}
 
                             </p>
-                           
                         </div>
 
-                        {% for item in order['items'] %}
+                        {% for item in orders.item_details %}
                         <div class="d-flex my-2">
-                            <img src="{{ url_for('static', filename=item['menu_details']['gambar'][7:]) }}" alt=""
+                            <img src="{{ url_for('static', filename=item.gambar[7:]) }}" alt=""
                                 class="rounded-3 object-fit-cover" width="120" height="120">
                             <div class="ms-3 d-md-flex justify-content-between flex-grow-1">
                                 <div class="text-dark">
-                                    <h6>{{ item['menu_details']['nama'] }}</h6>
-                                    <small>{{ item['quantity'] }} Barang x {{ item['menu_details']['harga'] | format_idr
-                                        }}</small>
+                                    <h6>{{ item.nama }}</h6>
+                                    <small>{{ item['quantity'] }} Barang x {{ item.harga | format_idr }}</small>
                                 </div>
                                 <div class="text-dark">
                                     <h6 class="d-none d-md-block">Total Harga</h6>
-                                    <p>{{ item['total'] | format_idr }}</p>
+                                    <p>{{ item.total | format_idr }}</p>
                                 </div>
                             </div>
                         </div>
-
                         {% endfor %}
-                        <div class="d-flex  align-items-center">
+
+                        <div class="d-flex align-items-center">
                             <div class="ms-auto">
                                 <h5>Total Pembelian</h5>
-                                <p>{{order.total_amount | format_idr }}</p>
+                                <h6>{{ orders.total_amount | format_idr }}</h6>
                             </div>
 
-                            {% if order.payment_status == 'pending' %}
+                            {% if orders.payment_status == 'pending' %}
                             <button class="btn btn-primary btn-pay-now ms-5 rounded-5 px-4"
-                                data-snap-token="{{ order.snap_token }}" data-order-id="{{ order.order_id }}">Bayar
+                                data-snap-token="{{ orders.snap_token }}" data-order-id="{{ orders.order_id }}">Bayar
                                 Sekarang</button>
                             {% endif %}
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
         </div>
+        {% endfor %}
     </div>
 </section>
 {% endif %}
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-    data-client-key="client_key"></script>
+<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="client_key"></script>
 <script>
     $(document).ready(function () {
         // Initialize countdown for each order
@@ -119,7 +117,6 @@ Pesanan
             // Optionally, you can perform an AJAX request to cancel the transaction
         });
     });
-
 
     function initializeCountdown(expiryTime, element) {
         var expiryDate = new Date(expiryTime.replace(/-/g, '/'));

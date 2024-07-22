@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
 from functools import wraps
-from models import menus_collection,carts_collection,orders_collection
+from models import menus_collection,carts_collection,get_order
 from werkzeug.utils import secure_filename
 import os
 from bson import ObjectId
@@ -29,7 +29,7 @@ def admin_required(f):
 @admin_required
 @login_required
 def dashboard():
-    order = orders_collection()
+    
     return render_template('admin/dashboard.html')
 
 @admin_bp.route('/add_menu', methods=['GET', 'POST'])
@@ -176,3 +176,9 @@ def edit_menu(menu_id):
 
     return redirect(url_for('admin.add_menu'))  # Redirect to your page
 
+@admin_bp.route('/transaksi')
+@admin_required
+@login_required
+def transaksi():
+    orders = get_order()
+    return render_template('admin/transaksi.html', orders=orders)

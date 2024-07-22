@@ -47,7 +47,7 @@ def load_user(user_id):
 def get_cart_items_count():
     cart_items_count = 0
     if current_user.is_authenticated:
-        user_id = current_user.id  # Assuming 'carts' is the collection name
+        user_id = ObjectId(current_user.id)  # Assuming 'carts' is the collection name
         cart = carts_collection.find_one({'user_id': user_id})
         if cart:
             cart_items_count = len(cart.get('cart_items', []))

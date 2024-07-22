@@ -19,19 +19,18 @@ def create_auth_bp(users_collection, admins_collection):
             # Cek login untuk user
             user = users_collection.find_one({'email': email})
             if user and bcrypt.check_password_hash(user['password'], password):
-                user_obj = User(id=str(user['_id']), email=user['email'], role='user')
+                user_obj = User(user['_id'], email=user['email'], role='user')
                 login_user(user_obj)
                 return redirect(url_for('index'))  # Ganti 'index' dengan endpoint yang sesuai
 
             # Cek login untuk admin
             admin = admins_collection.find_one({'email': email})
             if admin and bcrypt.check_password_hash(admin['password'], password):
-                admin_obj = User(id=str(admin['_id']), email=admin['email'], role='admin')
+                admin_obj = User(admin['_id'], email=admin['email'], role='admin')
                 login_user(admin_obj)
                 return redirect(url_for('admin.dashboard'))  # Ganti 'admin.dashboard' dengan endpoint yang sesuai
 
             flash('Invalid email or password', 'danger')
-
         return render_template('auth/login.html')
 
     @auth_bp.route('/register', methods=['GET', 'POST'])

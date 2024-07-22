@@ -1,28 +1,16 @@
-import requests
+from flask_bcrypt import Bcrypt
 
-def get_midtrans_snap(order_id):
-    snap_url = f"https://app.midtrans.com/snap/v1/transactions/{order_id}"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Basic U0ItTWlkLXNlcnZlci16OEZTZkx6ZG5JX2E3aXFvVm9yQmlkY0o6TWFwaW5haDMxKys="
-    }
+bcrypt = Bcrypt()
 
-    response = requests.get(snap_url, headers=headers)
+def main():
+    # Kata sandi yang ingin di-hash
+    password = "admin123"
 
-    if response.status_code == 200:
-        # Response JSON contains the Snap URL and other transaction details
-        snap_response = response.json()
-        return snap_response['redirect_url']  # This URL should be used to redirect user to Snap
+    # Menghasilkan hash dari password
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    return None  # Handle error cases or invalid responses
+    # Mencetak hasil hash
+    print("Hash dari password '{}' adalah: {}".format(password, hashed_password))
 
-# Usage example:
-order_id = "LanggengCatering-030fc3c9-2024-07-08"
-snap_url = get_midtrans_snap(order_id)
-
-if snap_url:
-    # Redirect user to the Snap Midtrans payment page
-    print(f"Redirecting user to Midtrans payment page: {snap_url}")
-    # In a web application, you would typically return a redirect response to this URL
-else:
-    print("Failed to retrieve Snap URL from Midtrans API")
+if __name__ == "__main__":
+    main()

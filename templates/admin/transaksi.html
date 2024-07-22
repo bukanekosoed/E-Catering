@@ -1,0 +1,68 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}
+Pesanan
+{% endblock %}
+
+{% block content %}
+{% if orders %}
+<section>
+    <div class="container py-5">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Overview Pendapatan</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="card-text">Total Pendapatan: <!-- Tambahkan logika untuk menghitung total pendapatan dari orders --></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="card-text">Jumlah Pesanan: {{ orders|length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="fw-bold mb-4">Daftar Transaksi</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Customer Name</th>
+                        <th scope="col">Total Amount</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order_id }}</td>
+                        <td>{{ order.user['name'] }}</td>
+                        <td>{{ order.total_amount | format_idr}}</td>
+                        <td><p  class="ms-3 badge rounded-pill fs-6 ms-auto
+                            {% if order.payment_status == 'pending' %}
+                                bg-warning
+                            {% elif order.payment_status == 'settlement' %}
+                                bg-primary 
+                            {% else %}
+                                bg-danger
+                            {% endif %}
+                            ">
+                            <ion-icon
+                                name="{% if order.payment_status == 'pending' %}time{% elif order.payment_status == 'settlement' %}checkmark-circle{% else %}close-circle{% endif %}"
+                                class="me-1"></ion-icon>
+                            <span>{{ order.payment_status }}</span>
+                        </p></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% else %}
+<p>No orders found.</p>
+{% endif %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}

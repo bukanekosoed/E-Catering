@@ -100,8 +100,7 @@
                     href="{{ url_for('user.menu') }}"
                         href=""><ion-icon name="fast-food-outline" class="fs-3"></ion-icon></a>
                     <a class="nav-link col text-center p-2 p-md-3 {% if request.path == url_for('user.get_order') %}active fw-bold text-white bg-primary rounded-4 {% endif %}" href="{{ url_for('user.get_order') }}"><ion-icon name="receipt-outline" class="fs-3"></ion-icon></a>
-                    <a class="nav-link col text-center p-2 p-md-3"
-                        aria-current="page" href=""><ion-icon name="person-outline" class="fs-3"></ion-icon></i></a>
+                    <a class="nav-link col text-center p-2 p-md-3{% if request.path == url_for('user.get_order') %}active fw-bold text-white bg-primary rounded-4 {% endif %}" href="{{ url_for('user.get_order') }}" ><ion-icon name="person-outline" class="fs-3"></ion-icon></i></a>
                 </div>
 
             </div>
