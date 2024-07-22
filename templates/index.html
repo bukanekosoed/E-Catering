@@ -166,11 +166,13 @@ Home
                                 <img class="img-fluid object-fit-cover rounded-top"
                                     src="{{ url_for('static', filename=menu.gambar[7:]) }}" alt="{{menu.nama}}">
                             </div>
+                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute"
+                                style="top: 10px; left: 10px;">{{menu.kategori}}</div>
                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                 <h4 class="fw-bold">{{menu.nama}}</h4>
                                 <p>Minimal Pembelian {{menu.minimal_pembelian}}</p>
                                 <div
-                                    class="d-lg-flex justify-content-between d-block justify-content-center align-items-center">
+                                    class="justify-content-between d-block justify-content-center align-items-center">
                                     <strong>{{ menu.harga | format_idr }}</strong>
                                     <form method="POST" action="{{ url_for('user.add_to_cart', menu_id=menu._id) }}">
                                         <input type="hidden" name="menu_id" value="{{ menu._id }}">
@@ -180,6 +182,7 @@ Home
                                             Keranjang
                                         </button>
                                     </form>
+
                                 </div>
                             </div>
                         </div>

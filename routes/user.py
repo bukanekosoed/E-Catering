@@ -59,7 +59,7 @@ def add_to_cart(menu_id):
         flash('Menu Berhasil Ditambahkan','success')
 
     # Redirect to the previous page or the cart page
-    return redirect(url_for('index'))
+    
 
 @user_bp.route('/keranjang')
 @login_required
