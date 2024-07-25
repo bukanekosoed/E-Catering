@@ -178,7 +178,7 @@ def checkout():
             transaction_details = {
                 'transaction_details': {
                     'order_id': f'LanggengCatering-{uuid.uuid4().hex[:4]}',
-                    'gross_amount': cart_details['grandTotal']
+                    'gross_amount': cart_details['grandTotalWithPPN']
                 },
                 
                 "item_details": item_details,
