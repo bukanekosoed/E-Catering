@@ -49,7 +49,7 @@ Keranjang
                                                 </button>
                                                 <input type="hidden" name="menu_id" value="{{ item._id }}">
                                                 <input id="quantity_menu_id" min="0" name="quantity"
-                                                    value="{{ item.quantity }}" type="number"
+                                                    value="{{ item.quantity }}" type="text" inputmode="numeric"
                                                     class="form-control form-control-sm w-50 text-center rounded-5" />
                                                 <button class="btn" type="submit" name="action" value="increase">
                                                     <ion-icon name="add-outline"
@@ -116,26 +116,29 @@ Keranjang
                                 </div>
 
                                 <div class="col-12">
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <label for="streetAddress" class="form-label">Nama Jalan</label>
                                         <input type="text" class="form-control" id="streetAddress"
                                             placeholder="Nama Jalan">
                                     </div>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
-                    <div class="border-top pt-4">
-                        <div class="d-flex justify-content-between text-lg fw-bold">
-                            <span>Total:</span>
+                
+                        <div class="d-flex justify-content-between text-lg  ">
+                            <span>Total :</span>
                             <span id="grandTotal">{{ cart_details.grandTotal | format_idr }}</span>
-                            <small>Biaya PPN(11%):</small>
-                            <small id="grandTotal">{{ cart_details.ppn | format_idr }}</small>
-
                         </div>
-                    </div>
+                        <div class="d-flex justify-content-between text-lg  text-muted mb-2">
+                            <small>Biaya PPN (11%) :</small>
+                            <small id="grandTotal">{{ cart_details.ppn | format_idr }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between text-lg fw-bold border-top pt-2">
+                            <p>Total Belanja :</p>
+                            <p id="grandTotal">{{ cart_details.grandTotalWithPPN | format_idr }}</p>
+                        </div>
+                  
                     <button class="btn btn-primary w-100 mt-4 rounded-4 shadow p-3" id="checkout-btn">
                         <i class="bi bi-bag-check fs-5 mx-2"></i>Checkout ( {{cart_details.cart_items | length}} )
                     </button>
