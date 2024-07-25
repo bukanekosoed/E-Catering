@@ -131,6 +131,9 @@ Keranjang
                         <div class="d-flex justify-content-between text-lg fw-bold">
                             <span>Total:</span>
                             <span id="grandTotal">{{ cart_details.grandTotal | format_idr }}</span>
+                            <span>Biaya PPN(11%):</span>
+                            <span id="grandTotal">{{ cart_details.ppn | format_idr }}</span>
+
                         </div>
                     </div>
                     <button class="btn btn-primary w-100 mt-4 rounded-4 shadow p-3" id="checkout-btn">

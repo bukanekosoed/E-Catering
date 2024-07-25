@@ -34,109 +34,133 @@ def get_cart_details():
                 }
             },
             {
-            '$lookup': {
-                'from': 'menus', 
-                'localField': 'cart_items.menu_id', 
-                'foreignField': '_id', 
-                'as': 'cart_items_with_menus'
-            }
-            }, 
-            {
-            '$lookup': {
-                'from': 'users', 
-                'localField': 'user_id', 
-                'foreignField': '_id', 
-                'as': 'user'
-            }
-            },
-            {
-                '$addFields': {
-                    'cart_items': {
-                        '$map': {
-                            'input': '$cart_items', 
-                            'as': 'item', 
-                            'in': {
-                                '$mergeObjects': [
-                                    '$$item', {
-                                        '$arrayElemAt': [
-                                            {
-                                                '$filter': {
-                                                    'input': '$cart_items_with_menus', 
-                                                    'cond': {
-                                                        '$eq': [
-                                                            '$$this._id', '$$item.menu_id'
-                                                        ]
-                                                    }
-                                                }
-                                            }, 0
-                                        ]
-                                    }
+        '$lookup': {
+            'from': 'menus', 
+            'localField': 'cart_items.menu_id', 
+            'foreignField': '_id', 
+            'as': 'cart_items_with_menus'
+        }
+    }, 
+    {
+        '$lookup': {
+            'from': 'users', 
+            'localField': 'user_id', 
+            'foreignField': '_id', 
+            'as': 'user'
+        }
+    },
+    {
+        '$addFields': {
+            'cart_items': {
+                '$map': {
+                    'input': '$cart_items', 
+                    'as': 'item', 
+                    'in': {
+                        '$mergeObjects': [
+                            '$$item', {
+                                '$arrayElemAt': [
+                                    {
+                                        '$filter': {
+                                            'input': '$cart_items_with_menus', 
+                                            'cond': {
+                                                '$eq': [
+                                                    '$$this._id', '$$item.menu_id'
+                                                ]
+                                            }
+                                        }
+                                    }, 0
                                 ]
                             }
-                        }
-                    }, 
-                    'cart_items_with_menus': '$$REMOVE', 
-                    'user': {
-                        '$arrayElemAt': [
-                            '$user', 0
                         ]
                     }
                 }
             }, 
-            {
-                '$addFields': {
-                    'cart_items': {
-                        '$map': {
-                            'input': '$cart_items', 
-                            'as': 'item', 
-                            'in': {
-                                '$mergeObjects': [
-                                    '$$item', {
-                                        'total': {
-                                            '$multiply': [
-                                                '$$item.quantity', '$$item.harga'
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }, 
-                    'grandTotal': {
-                        '$sum': {
-                            '$map': {
-                                'input': '$cart_items', 
-                                'as': 'item', 
-                                'in': {
+            'cart_items_with_menus': '$$REMOVE', 
+            'user': {
+                '$arrayElemAt': [
+                    '$user', 0
+                ]
+            }
+        }
+    }, 
+    {
+        '$addFields': {
+            'cart_items': {
+                '$map': {
+                    'input': '$cart_items', 
+                    'as': 'item', 
+                    'in': {
+                        '$mergeObjects': [
+                            '$$item', {
+                                'total': {
                                     '$multiply': [
                                         '$$item.quantity', '$$item.harga'
                                     ]
                                 }
                             }
-                        }
+                        ]
                     }
                 }
             }, 
-            {
-                '$project': {
-                    'user_id': 1, 
-                    'cart_items': {
-                        'menu_id': 1, 
-                        'nama': 1, 
-                        'kategori': 1, 
-                        'quantity': 1, 
-                        'harga': 1, 
-                        'total': 1,
-                        'gambar': 1, 
-                    }, 
-                    'user': {
-                        'name': 1, 
-                        'email': 1, 
-                        'phone': 1
-                    }, 
-                    'grandTotal': 1
+            'grandTotal': {
+                '$sum': {
+                    '$map': {
+                        'input': '$cart_items', 
+                        'as': 'item', 
+                        'in': {
+                            '$multiply': [
+                                '$$item.quantity', '$$item.harga'
+                            ]
+                        }
+                    }
                 }
             }
+        }
+    }, 
+    {
+        '$addFields': {
+            'grandTotalWithPPN': {
+                '$trunc': {
+                    '$multiply': [
+                        '$grandTotal', 1.11
+                    ]
+                }
+            }
+        }
+    },
+  	{
+        '$addFields': {
+            'ppn': {
+                '$trunc': {
+                    '$multiply': [
+                        '$grandTotal', 0.11
+                    ]
+                }
+            }
+        }
+    },
+    {
+        '$project': {
+            'user_id': 1, 
+            'cart_items': {
+                'menu_id': 1, 
+                'nama': 1, 
+                'kategori': 1, 
+                'quantity': 1, 
+                'harga': 1, 
+                'total': 1,
+                'gambar': 1
+            }, 
+            'user': {
+                'name': 1, 
+                'email': 1, 
+                'phone': 1
+            }, 
+            'grandTotal': 1,
+          	'ppn': 1,
+            'grandTotalWithPPN': 1,
+        }
+    }
     ]
         
         cart = carts_collection.aggregate(pipeline)
